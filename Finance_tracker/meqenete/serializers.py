@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User
+from .models import User, Category
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -22,3 +22,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(TokenObtainPairSerializer):
     username_field = 'email'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'created_at']
