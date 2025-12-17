@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User, Category
+from .models import User, Category, Expense
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -28,3 +28,18 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'created_at']
+
+
+class ExpenseSerializer(serializers.ModelSerializer):
+
+    def validate_category(self, value):
+        request = self.context['request']
+        if value.user != request.user:
+            raise serializers.ValidationError(
+                "You can only use your own categories."
+            )
+        return value
+    
+    class Meta:
+        model = Expense
+        fields = ['id', 'category', 'amount', 'description', 'date', 'created_at']
