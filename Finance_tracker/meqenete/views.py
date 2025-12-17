@@ -2,8 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from .models import User, Category, Expense
-from .serializers import RegisterSerializer, LoginSerializer, CategorySerializer, ExpenseSerializer
+from .models import User, Category, Expense, Income
+from .serializers import RegisterSerializer, LoginSerializer, CategorySerializer, ExpenseSerializer, IncomeSerializer
 
 
 
@@ -39,6 +39,17 @@ class ExpenseViewSet(ModelViewSet):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class IncomeViewSet(ModelViewSet):
+    serializer_class = IncomeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Income.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

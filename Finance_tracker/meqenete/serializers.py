@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User, Category, Expense
+from .models import User, Category, Expense, Income
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -43,3 +43,10 @@ class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = ['id', 'category', 'amount', 'description', 'date', 'created_at']
+
+
+class IncomeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Income
+        fields = ['id', 'source', 'amount', 'date', 'created_at'
+        ]
