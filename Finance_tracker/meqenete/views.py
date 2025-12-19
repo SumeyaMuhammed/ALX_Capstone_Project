@@ -4,10 +4,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Sum
 from decimal import Decimal
 from .models import User, Category, Expense, Income
 from .serializers import RegisterSerializer, LoginSerializer, CategorySerializer, ExpenseSerializer, IncomeSerializer
+from .pagination import StandardResultsPagination
 
 
 
@@ -31,10 +35,36 @@ class CategoryViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+# ---------- Filters ----------
+
+class ExpenseFilter(filters.FilterSet):
+    category_name = filters.CharFilter(field_name='category__name', lookup_expr='iexact')
+    month = filters.NumberFilter(field_name='date', lookup_expr='month')
+    year = filters.NumberFilter(field_name='date', lookup_expr='year')
+
+    class Meta:
+        model = Expense
+        fields = ['category_name', 'month', 'year']
+
+
+class IncomeFilter(filters.FilterSet):
+    month = filters.NumberFilter(field_name='date', lookup_expr='month')
+    year = filters.NumberFilter(field_name='date', lookup_expr='year')
+
+    # Optional: allow source filtering by exact string
+    source = filters.CharFilter(field_name='source', lookup_expr='iexact')
+
+    class Meta:
+        model = Income
+        fields = ['source', 'month', 'year']
+
 
 class ExpenseViewSet(ModelViewSet):
     serializer_class = ExpenseSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ExpenseFilter
 
     def get_queryset(self):
         return Expense.objects.filter(user=self.request.user)
@@ -51,6 +81,9 @@ class ExpenseViewSet(ModelViewSet):
 class IncomeViewSet(ModelViewSet):
     serializer_class = IncomeSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['source']
 
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
