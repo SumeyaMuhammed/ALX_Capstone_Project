@@ -32,6 +32,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ExpenseSerializer(serializers.ModelSerializer):
 
+    def validate(self, data):
+        if self.instance and self.instance.status == 'APPROVED':
+            raise serializers.ValidationError("Cannot edit an approved expense.")
+        return data
+
     def validate_category(self, value):
         request = self.context['request']
         if value.user != request.user:
@@ -42,7 +47,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Expense
-        fields = ['id', 'category', 'amount', 'description', 'date', 'created_at']
+        fields = ['id', 'category', 'amount', 'description', 'date', 'created_at', 'status']
 
 
 class IncomeSerializer(serializers.ModelSerializer):

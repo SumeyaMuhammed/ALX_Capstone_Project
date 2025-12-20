@@ -25,6 +25,11 @@ class Category(models.Model):
     
   
 class Expense(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+    ]
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -39,10 +44,10 @@ class Expense(models.Model):
     description = models.CharField(max_length=255, blank=True)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     def __str__(self):
-        return f"{self.category} - {self.amount}"
-    
+        return f"{self.category} - {self.amount} ({self.status})"    
 
 class Income(models.Model):
     user = models.ForeignKey(

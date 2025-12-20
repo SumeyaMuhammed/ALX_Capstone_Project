@@ -4,6 +4,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import status
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters.rest_framework import DjangoFilterBackend
@@ -46,7 +48,6 @@ class ExpenseFilter(filters.FilterSet):
         model = Expense
         fields = ['category_name', 'month', 'year']
 
-
 class IncomeFilter(filters.FilterSet):
     month = filters.NumberFilter(field_name='date', lookup_expr='month')
     year = filters.NumberFilter(field_name='date', lookup_expr='year')
@@ -77,6 +78,23 @@ class ExpenseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        expense = self.get_object()
+        if expense.status == 'APPROVED':
+            return Response({'detail': 'Expense already approved.'}, status=status.HTTP_400_BAD_REQUEST)
+        expense.status = 'APPROVED'
+        expense.save()
+        return Response({'detail': 'Expense approved.'})
+
+    @action(detail=True, methods=['post'])
+    def revert(self, request, pk=None):
+        expense = self.get_object()
+        if expense.status == 'PENDING':
+            return Response({'detail': 'Expense already pending.'}, status=status.HTTP_400_BAD_REQUEST)
+        expense.status = 'PENDING'
+        expense.save()
+        return Response({'detail': 'Expense reverted to pending.'})
 
 class IncomeViewSet(ModelViewSet):
     serializer_class = IncomeSerializer
