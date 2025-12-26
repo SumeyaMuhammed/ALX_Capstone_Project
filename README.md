@@ -153,6 +153,10 @@ The API is deployed on Railway using:
 - PostgreSQL database
 - dj_database_url for environment-based configuration
 
+[https://meqenete.up.railway.app](https://meqenete.up.railway.app)
+
+> ⚠️ Note: This free deployment will only remain live for the duration of the Railway free trial. After the trial ends, the service and database will no longer be accessible.To ensure the API can always be tested, you can run it locally by following the **Setup Instructions** above. This will allow you to start the server and test all endpoints even after the deployed link is inactive. Also the root URL `/` returns 404. Use the `/api/...` endpoints to interact with the API.
+
 
 ## Author
 **Sumeya Muhammed**
